@@ -1,3 +1,5 @@
 # English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  issue_rank:
+    update_ranks_with_display_orders: "Update issue ranks with current sort order"
+    sure_to_update_ranks: "Sure to update ranks of all tickets in this project?"

@@ -1,0 +1,5 @@
+# Japanese strings go here for Rails i18n
+ja:
+  issue_rank:
+    update_ranks_with_display_orders: "チケットのRankを現在の表示順で一括更新する"
+    sure_to_update_ranks: "このプロジェクト内のチケットのRankを一括更新してよろしいですか?"

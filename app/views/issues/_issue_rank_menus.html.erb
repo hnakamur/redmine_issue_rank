@@ -1,14 +1,10 @@
 <% if controller_name == 'issues' && action_name == 'index' && @project %>
 <ul>
-<li><%= link_to "チケットのRankを現在の表示順で一括更新する",
+<li><%= link_to l("issue_rank.update_ranks_with_display_orders"),
   issue_rank_update_ranks_with_display_orders_path(
     params.delete_if { |k, v| k.to_s == 'controller' }),
-  {
     :method => :post,
-    :data => {
-      :confirm => "チケットのRankを一括更新してよろしいですか?"
-    }
-  }
+    :data => { :confirm => l("issue_rank.sure_to_update_ranks") }
 %></li>
 </ul>
 <% end %>
