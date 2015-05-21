@@ -16,7 +16,10 @@ class IssueRankController < ApplicationController
     unless field
       redirect_to project_issues_path(@project),
         { :flash =>
-          { :error => 'Please create "Rank" custom field before using this menu' }
+          { :error =>
+            l('issue_rank.create_custome_field_in_advance',
+              :field_name => IssueRank::rank_custom_field_name)
+          }
         }
       return
     end

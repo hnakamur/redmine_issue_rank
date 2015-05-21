@@ -4,3 +4,4 @@ ja:
     update_ranks_with_display_orders: "チケットのRankを現在の表示順で一括更新する"
     sure_to_update_ranks: "このプロジェクト内のチケットのRankを一括更新してよろしいですか?"
     rank_custom_field_name: "順位として使用するカスタムフィールドの名前"
+    create_custome_field_in_advance: "「%{field_name}」という整数のカスタムフィールドを作成してから再度実行してください"

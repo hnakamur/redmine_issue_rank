@@ -74,7 +74,7 @@ module IssueRank
   end
 
   def self.rank_custom_field_name
-    'Rank' # TODO: Use settings instead of hardcoding
+    Setting.plugin_redmine_issue_rank['rank_custom_field_name']
   end
 
   def self.find_rank_custom_field

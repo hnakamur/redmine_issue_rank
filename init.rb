@@ -6,14 +6,14 @@ unless Issue.included_modules.include? IssueRank::IssueHook
 Issue.send(:include, IssueRank::IssueHook)
 end
 
-Redmine::Plugin.register :redmine_issue_rank_plugin do
-  name 'Redmine Issue Rank Plugin plugin'
-  author 'Author name'
-  description 'This is a plugin for Redmine'
+Redmine::Plugin.register :redmine_issue_rank do
+  name 'Redmine Issue Rank plugin'
+  author 'Hiroaki Nakamura'
+  description 'Automatically renumber ranks of issues in a project which are saved in the specific custom fields'
   version '0.0.1'
   url 'http://example.com/path/to/plugin'
   author_url 'http://example.com/about'
 
-  settings :default => {'empty' => true}, :partial => 'settings/issue_rank_plugin'
+  settings :default => { 'rank_custom_field_name' => 'Rank' }, :partial => 'settings/issue_rank'
 end
 
