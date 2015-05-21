@@ -13,5 +13,7 @@ Redmine::Plugin.register :redmine_issue_rank_plugin do
   version '0.0.1'
   url 'http://example.com/path/to/plugin'
   author_url 'http://example.com/about'
+
+  settings :default => {'empty' => true}, :partial => 'settings/issue_rank_plugin'
 end
 
