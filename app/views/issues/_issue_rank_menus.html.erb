@@ -1,0 +1,23 @@
+<% if controller_name == 'issues' and action_name == 'index' %>
+<ul>
+<li><%= link_to "未完了チケットのRankを現在の表示順で一括更新する",
+  issue_rank_update_ranks_with_display_orders_path(
+    params.delete_if { |k, v| k == 'controller' }),
+  {
+    :method => :post,
+    :data => {
+      :confirm => "未完了チケットのRankを一括更新してよろしいですか?"
+    }
+  }
+%></li>
+<li><%= link_to "完了したチケットのRankを一括消去する",
+  issue_rank_clear_closed_issues_ranks_path(@project),
+  {
+    :method => :post,
+    :data => {
+      :confirm => "完了したチケットのRankを一括消去してよろしいですか?"
+    }
+  }
+%></li>
+</ul>
+<% end %>
