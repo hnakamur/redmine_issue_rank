@@ -3,7 +3,7 @@ require 'issue_rank/hooks'
 # Guards against including the module multiple time (like in tests)
 # and registering multiple callbacks
 unless Issue.included_modules.include? IssueRank::IssueHook
-Issue.send(:include, IssueRank::IssueHook)
+  Issue.send(:include, IssueRank::IssueHook)
 end
 
 Redmine::Plugin.register :redmine_issue_rank do

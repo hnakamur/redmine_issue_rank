@@ -1,3 +1,0 @@
-= redmine_issue_rank_plugin
-
-Description goes here
