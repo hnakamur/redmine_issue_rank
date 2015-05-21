@@ -5,3 +5,5 @@ en:
     sure_to_update_ranks: "Sure to update ranks of all tickets in this project?"
     rank_custom_field_name: "custom field name for rank"
     create_custome_field_in_advance: "Please create an integer custom field named \"%{field_name}\" and try again"
+  project_module_issue_rank: "Issue Rank"
+  permission_renumber_ranks_with_display_orders: "Renumber ranks with display orders"

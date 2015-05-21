@@ -1,7 +1,9 @@
 # Japanese strings go here for Rails i18n
 ja:
   issue_rank:
-    update_ranks_with_display_orders: "チケットのRankを現在の表示順で一括更新する"
-    sure_to_update_ranks: "このプロジェクト内のチケットのRankを一括更新してよろしいですか?"
+    update_ranks_with_display_orders: "チケットの順位を現在の表示順で一括更新する"
+    sure_to_update_ranks: "このプロジェクト内のチケットの順位を一括更新してよろしいですか?"
     rank_custom_field_name: "順位として使用するカスタムフィールドの名前"
     create_custome_field_in_advance: "「%{field_name}」という整数のカスタムフィールドを作成してから再度実行してください"
+  project_module_issue_rank: "チケットの順位"
+  permission_renumber_ranks_with_display_orders: "チケット一覧の表示順で順位を一括更新"

@@ -14,6 +14,9 @@ Redmine::Plugin.register :redmine_issue_rank do
   url 'http://example.com/path/to/plugin'
   author_url 'http://example.com/about'
 
+  project_module :issue_rank do
+    permission :renumber_ranks_with_display_orders, {:issue_rank => :update_ranks_with_display_orders}, :require => :member
+  end
   settings :default => { 'rank_custom_field_name' => 'Rank' }, :partial => 'settings/issue_rank'
 end
 
