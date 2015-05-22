@@ -66,7 +66,10 @@ class IssueRankController < ApplicationController
         end
       end
 
-      redirect_to issues_url
+      redirect_to issues_url,
+        { :flash =>
+          { :notice => l('issue_rank.finished_renumbering_issue_ranks') }
+        }
     else
       redirect_to project_issues_path(@project)
     end
