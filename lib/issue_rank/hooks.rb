@@ -89,7 +89,7 @@ module IssueRank
       .joins('JOIN issues ON custom_values.customized_id = issues.id')
       .joins('JOIN issue_statuses ON issues.status_id = issue_statuses.id')
       .where(:issues => {:project_id => project_id})
-      .where(:issue_statuses => {:is_closed => 0})
+      .where(:issue_statuses => {:is_closed => false})
       .where(:customized_type => 'Issue')
       .where(:custom_field_id => field.id)
       .pluck(:value)
