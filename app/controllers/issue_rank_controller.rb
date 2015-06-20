@@ -30,44 +30,39 @@ class IssueRankController < ApplicationController
     @query.sort_criteria = sort_criteria.to_a
 
     if @query.valid?
-      ensure_issue_custom_field_values(@project, field)
-
-      @issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
-                              :order => sort_clause)
-      issues_map = {}
-      @issues.each_with_index do |issue, index|
-        issues_map[issue.id] = [index, issue]
-      end
-      last_issue = @issues.max { |issue| issue.id }
-
-      closed_status_ids = IssueRank::find_closed_issue_status_ids
-
-      values = CustomValue
-        .joins('JOIN issues ON custom_values.customized_id = issues.id')
-        .where(:customized_type => 'Issue')
-        .where(:custom_field_id => field.id)
-        .where(:issues => {:project_id => @project.id})
-        .readonly(false)
-        .to_a
-      # NOTE: Rankを一括設定するためにソートする。ソート順は以下の通り。
-      # 1. チケット一覧に表示されているチケットの後に非表示のチケット
-      # 2. チケット一覧に表示されているチケットはその順
-      # 3. 表示されていない場合はRankの値順
-      # 4. 表示されていなくてRankが同じ場合はチケットID順
-      values.sort_by! do |v|
-        issue_id = v.customized_id
-        index, issue = issues_map[issue_id]
-        closed = issue ? closed_status_ids.include?(issue.status_id) : 1
-        new_index = index || (last_issue.id + 1)
-        [closed ? 1 : 0, new_index, v.value.to_i, v.customized_id]
-      end
-
       ActiveRecord::Base.transaction do
-        values.each_with_index do |v, i|
+        ensure_issue_custom_field_values(@project, field)
+
+        @visible_issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
+                                :order => sort_clause)
+        visible_issues_map = {}
+        @visible_issues.each_with_index do |issue, index|
+          visible_issues_map[issue.id] = [index, issue]
+        end
+        last_issue = @visible_issues.max { |issue| issue.id }
+
+        closed_status_ids = IssueRank::find_closed_issue_status_ids
+
+        # NOTE: Rankを一括設定するためにソートする。ソート順は以下の通り。
+        # 1. チケット一覧に表示されているチケットの後に非表示のチケット
+        # 2. チケット一覧に表示されているチケットはその順
+        # 3. 表示されていない場合はRankの値順
+        # 4. 表示されていなくてRankが同じ場合はチケットID順
+        issues = @project.issues
+        issues.sort_by! do |issue|
+          index, visible_issue = visible_issues_map[issue.id]
+          closed = visible_issue ? closed_status_ids.include?(issue.status_id) : 1
+          new_index = index || (last_issue.id + 1)
+          v = issue.custom_value_for(field)
+          [closed ? 1 : 0, new_index, v.value.to_i, v.customized_id]
+        end
+
+        issues.each_with_index do |issue, i|
           rank = (i + 1).to_s
+          v = issue.custom_value_for(field)
           if v.value != rank
             v.value = rank
-            v.save!
+            issue.save!
           end
         end
       end
