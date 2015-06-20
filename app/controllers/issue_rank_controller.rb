@@ -85,7 +85,6 @@ class IssueRankController < ApplicationController
   end
 
   def issues_url
-    Rails.logger.error "###issues_url. referer=#{request.referer}, url=#{request.url}"
     request.referer
   end
 
