@@ -30,6 +30,8 @@ class IssueRankController < ApplicationController
     @query.sort_criteria = sort_criteria.to_a
 
     if @query.valid?
+      ensure_issue_custom_field_values(@project, field)
+
       @issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
                               :order => sort_clause)
       issues_map = {}
@@ -90,5 +92,13 @@ class IssueRankController < ApplicationController
   def issues_url
     Rails.logger.error "###issues_url. referer=#{request.referer}, url=#{request.url}"
     request.referer
+  end
+
+  def ensure_issue_custom_field_values(project, field)
+    project.issues.each do |issue|
+      unless issue.custom_value_for(field)
+        issue.save_custom_field_values
+      end
+    end
   end
 end
