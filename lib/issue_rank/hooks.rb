@@ -20,18 +20,10 @@ module IssueRank
       was_closed = closed_status_ids.include?(status_id_was)
       return if (is_closed && was_closed) || (!is_closed && !was_closed)
 
-      value = CustomValue
-        .joins('JOIN issues ON custom_values.customized_id = issues.id')
-        .where(:issues => {:project_id => self.project_id})
-        .where(:customized_type => 'Issue')
-        .where(:custom_field_id => field.id)
-        .where(:customized_id => self.id)
-        .readonly(false)
-        .first
+      value = custom_value_for(field)
       if value
-        rank = IssueRank::max_rank_of_open_issues(self.project_id) + 1
-        value.value = rank.to_s
-        value.save!
+        rank = IssueRank::max_rank_of_open_issues(project) + 1
+        self.custom_field_values = { field.id.to_s => rank.to_s }
       end
     end
 
@@ -41,23 +33,21 @@ module IssueRank
 
       retry_count = 5
       begin
-        values = CustomValue
-          .joins('JOIN issues ON custom_values.customized_id = issues.id')
-          .where(:issues => {:project_id => self.project_id})
-          .where(:customized_type => 'Issue')
-          .where(:custom_field_id => field.id)
-          .readonly(false)
-          .to_a
-        values.sort_by! do |v|
+        issues = project.issues.to_a
+        issues.each do |issue|
+          v = issue.custom_value_for(field)
+        end
+        issues.sort_by! do |issue|
+          v = issue.custom_value_for(field)
           [v.value.to_i, v.customized_id == self.id ? 0 : 1, v.customized_id]
         end
-
         ActiveRecord::Base.transaction do
-          values.each_with_index do |v, i|
+          issues.each_with_index do |issue, i|
             rank = (i + 1).to_s
+            v = issue.custom_value_for(field)
             if v.value != rank
-              v.value = rank
-              v.save!
+              issue.custom_field_values = { field.id.to_s => rank.to_s }
+              issue.save!
             end
           end
         end
@@ -81,19 +71,15 @@ module IssueRank
     CustomField.where(:name => rank_custom_field_name).first
   end
 
-  def self.max_rank_of_open_issues(project_id)
+  def self.max_rank_of_open_issues(project)
     field = find_rank_custom_field
     return nil unless field
 
-    values = CustomValue
-      .joins('JOIN issues ON custom_values.customized_id = issues.id')
-      .joins('JOIN issue_statuses ON issues.status_id = issue_statuses.id')
-      .where(:issues => {:project_id => project_id})
-      .where(:issue_statuses => {:is_closed => false})
-      .where(:customized_type => 'Issue')
-      .where(:custom_field_id => field.id)
-      .pluck(:value)
-    values.map { |v| v.to_i }.max
+    open_issues = project.issues.select { |issue| !issue.status.is_closed }
+    ranks = open_issues.map do |issue|
+      issue.custom_value_for(field).value.to_i
+    end
+    ranks.max
   end
 
   def self.find_closed_issue_status_ids

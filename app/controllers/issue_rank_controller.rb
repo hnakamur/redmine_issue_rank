@@ -61,7 +61,7 @@ class IssueRankController < ApplicationController
           rank = (i + 1).to_s
           v = issue.custom_value_for(field)
           if v.value != rank
-            v.value = rank
+            issue.custom_field_values = { field.id.to_s => rank.to_s }
             issue.save!
           end
         end
