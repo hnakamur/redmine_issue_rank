@@ -34,9 +34,6 @@ module IssueRank
       retry_count = 5
       begin
         issues = project.issues.to_a
-        issues.each do |issue|
-          v = issue.custom_value_for(field)
-        end
         issues.sort_by! do |issue|
           v = issue.custom_value_for(field)
           [v.value.to_i, v.customized_id == self.id ? 0 : 1, v.customized_id]
@@ -46,8 +43,8 @@ module IssueRank
             rank = (i + 1).to_s
             v = issue.custom_value_for(field)
             if v.value != rank
-              issue.custom_field_values = { field.id.to_s => rank.to_s }
-              issue.save!
+              v.value = rank
+              v.save!
             end
           end
         end
