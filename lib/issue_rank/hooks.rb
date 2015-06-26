@@ -34,23 +34,16 @@ module IssueRank
       retry_count = 5
       begin
         issues = IssueRank::issues_with_available_custom_field(project, field)
-puts "renumber_ranks_of_issues_in_project. issues.size=#{issues.size}"
-issues.each_with_index do |issue, i|
-puts "before i=#{i}, issue.id=#{issue.id}, issue.status=#{issue.status}, issue.rank=#{issue.custom_value_for(field)}"
-end
         IssueRank::ensure_issue_custom_field_values(issues, field)
-        #issues = project.issues.select do |issue|
-        #  issue.available_custom_fields.include?(field)
-        #end
-        #issues.each do |issue|
-        #  unless issue.custom_value_for(field)
-        #    issue.save_custom_field_values
-        #  end
-        #  issue.reload
-        #end
+        issues.each { |issue| issue.reload }
         issues.sort_by! do |issue|
           v = issue.custom_value_for(field)
-          [v.value.to_i, v.customized_id == self.id ? 0 : 1, v.customized_id]
+          has_value = v.value.present?
+          [
+            has_value ? 0 : 1,
+            has_value ? v.value.to_i : 0,
+            v.customized_id == self.id ? 0 : 1, v.customized_id
+          ]
         end
         ActiveRecord::Base.transaction do
           issues.each_with_index do |issue, i|
@@ -62,9 +55,6 @@ end
             end
           end
         end
-issues.each_with_index do |issue, i|
-puts "after i=#{i}, issue.id=#{issue.id}, issue.status=#{issue.status}, issue.rank=#{issue.custom_value_for(field)}"
-end
       rescue ActiveRecord::StaleObjectError
         retry_count -= 1
         if retry_count > 0
@@ -111,7 +101,6 @@ end
     issues.each do |issue|
       unless issue.custom_value_for(field)
         issue.save_custom_field_values
-        issue.reload
       end
     end
   end
