@@ -30,13 +30,18 @@ class IssueRankController < ApplicationController
     @query.sort_criteria = sort_criteria.to_a
 
     if @query.valid?
+      puts "query.project=#{@query.project}"
+      puts "query.filters=#{@query.filters}"
       ActiveRecord::Base.transaction do
-        ensure_issue_custom_field_values(@project, field)
+        issues = IssueRank::issues_with_available_custom_field(@project, field)
+        IssueRank::ensure_issue_custom_field_values(issues, field)
+        #ensure_issue_custom_field_values(@project, field)
 
         @visible_issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
                                 :order => sort_clause)
         visible_issues_map = {}
         @visible_issues.each_with_index do |issue, index|
+          puts "visible_issue: i=#{index}, id=#{issue.id}, subject=#{issue.subject}, status=#{issue.status}, project_id=#{issue.project_id}"
           visible_issues_map[issue.id] = [index, issue]
         end
         last_issue = @visible_issues.max { |issue| issue.id }
@@ -61,13 +66,13 @@ class IssueRankController < ApplicationController
           rank = (i + 1).to_s
           v = issue.custom_value_for(field)
           if v.value != rank
-            issue.custom_field_values = { field.id.to_s => rank.to_s }
-            issue.save!
+            v.value = rank
+            v.save!
           end
         end
       end
 
-      redirect_to issues_url,
+      redirect_to project_issues_path(@project),
         { :flash =>
           { :notice => l('issue_rank.finished_renumbering_issue_ranks') }
         }
@@ -84,15 +89,11 @@ class IssueRankController < ApplicationController
     render_404
   end
 
-  def issues_url
-    request.referer
-  end
-
-  def ensure_issue_custom_field_values(project, field)
-    project.issues.each do |issue|
-      unless issue.custom_value_for(field)
-        issue.save_custom_field_values
-      end
-    end
-  end
+#  def ensure_issue_custom_field_values(project, field)
+#    project.issues.each do |issue|
+#      unless issue.custom_value_for(field)
+#        issue.save_custom_field_values
+#      end
+#    end
+#  end
 end
