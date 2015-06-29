@@ -5,6 +5,8 @@ en:
     sure_to_update_ranks: "Sure to update ranks of all tickets in this project?"
     rank_custom_field_name: "custom field name for rank"
     create_custome_field_in_advance: "Please create an integer custom field named \"%{field_name}\" and try again"
+    please_use_no_subject_filter: "Please set filter for subproject to none and try again"
+    please_remove_other_filters_than_subproject: "Plese remove filters other than subproject and try again"
     finished_renumbering_issue_ranks: "Finished renumbering issue ranks"
   project_module_issue_rank: "Issue Rank"
   permission_renumber_ranks_with_display_orders: "Renumber ranks with display orders"

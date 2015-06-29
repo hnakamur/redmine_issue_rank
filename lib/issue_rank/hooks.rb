@@ -99,7 +99,8 @@ module IssueRank
 
   def self.ensure_issue_custom_field_values(issues, field)
     issues.each do |issue|
-      unless issue.custom_value_for(field)
+      if issue.tracker.custom_fields.include?(field) &&
+          !issue.custom_value_for(field)
         issue.save_custom_field_values
       end
     end
