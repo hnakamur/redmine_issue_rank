@@ -26,10 +26,10 @@ This is a plugin for renumbering issue ranks automatically.
 
 * When you save an issue, ranks of all issues in the project will be adjusted automatically.
 * In the issues page, you can update ranks of all issues in the project with display orders by clicking "Update issue ranks with current sort order" menu in the side bar.
-   1. Ranks of visible issues are higher than invisible ones
-   2. Ranks of visible issues are set by display orders
-   3. Ranks of invisible issues are ordered by issue ranks
-   4. Ranks of same rank issues are ordered by issue IDs.
+   * Please set up filters before clicking this menu.
+       * If the project has subprojects, please set `subproject` filter to `none`.
+       * Make sure to delete other filters than `subproject` so that all issues including closed ones become visible.
+   * Ranks of all issues are updated same as display order in the issues list. Ranks will not be set for issues whose tracker is not enabled in the custom field settings.
 * You can manually edit the rank of an issue at the issue edit page.
    * When you save the issue, ranks of all issues in the project will be adjusted.
    * Among issues which have the same rank, the issue you editted will have 
