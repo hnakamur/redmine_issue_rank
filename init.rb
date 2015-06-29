@@ -10,9 +10,9 @@ Redmine::Plugin.register :redmine_issue_rank do
   name 'Redmine Issue Rank plugin'
   author 'Hiroaki Nakamura'
   description 'Automatically renumber ranks of issues in a project which are saved in the specific custom fields'
-  version '0.0.1'
-  url 'http://example.com/path/to/plugin'
-  author_url 'http://example.com/about'
+  version '0.1.0'
+  url 'https://github.com/hnakamur/redmine_issue_rank'
+  author_url 'https://hnakamur.github.io'
 
   project_module :issue_rank do
     permission :renumber_ranks_with_display_orders, {:issue_rank => :update_ranks_with_display_orders}, :require => :member
