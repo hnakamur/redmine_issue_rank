@@ -33,24 +33,34 @@ class IssueRankController < ApplicationController
       return
     end
 
-    if @query.filters.keys.any? {|k| k != "subproject_id" }
-      redirect_to project_issues_path(@project),
-        { :flash =>
-          { :error => t('issue_rank.please_remove_other_filters_than_subproject') }
-        }
-      return
-    end
-
     sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
     sort_update(@query.sortable_columns)
     @query.sort_criteria = sort_criteria.to_a
 
     if @query.valid?
       ActiveRecord::Base.transaction do
+        filtered_issues = @query.issues(:order => sort_clause)
+        filtered_issue_map = {}
+        filtered_issues.each_with_index do |issue, index|
+          filtered_issue_map[issue.id] = index
+        end
+        
         issues = IssueRank::issues_with_available_custom_field(@project, field)
         IssueRank::ensure_issue_custom_field_values(issues, field)
+        issues.sort_by! do |issue|
+          index = filtered_issue_map[issue.id]
+          if index
+            [0, index]
+          else
+            v = issue.custom_value_for(field)
+            if v
+              [1, v.value]
+            else
+              [2, -issue.id]
+            end
+          end
+        end
 
-        issues = @query.issues(:order => sort_clause)
         rank = 0
         issues.each do |issue|
           v = issue.custom_value_for(field)
