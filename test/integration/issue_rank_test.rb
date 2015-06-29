@@ -84,4 +84,58 @@ class IssueRankTest < ActionController::IntegrationTest
       assert_equal i + 1, issue.custom_value_for(field).value.to_i
     end
   end
+
+  def test_issue_rank_update_ranks_without_status_open_filter
+    Setting.plugin_redmine_issue_rank['rank_custom_field_name'] = 'Rank'
+    project1 = projects(:projects_001)
+    tracker1 = trackers(:trackers_001)
+    tracker2 = trackers(:trackers_002)
+    field = IssueCustomField.create!(
+      :name => 'Rank',
+      :type => 'IssueCustomField',
+      :field_format => 'int',
+      :projects => [project1],
+      :trackers => [tracker1])
+
+    log_user('jsmith', 'jsmith')
+
+    get "/projects/#{project1.identifier}/issues"
+    assert_response :success
+    assert_template 'issues/index'
+
+    post "/projects/#{project1.identifier}/issue_rank/update_ranks_with_display_orders"
+    assert_response 302
+    assert_equal I18n.t('issue_rank.please_use_no_subject_filter'), flash[:error]
+    assert_equal nil, flash[:notice]
+  end
+
+  def test_issue_rank_update_ranks_without_none_subproject_filter
+    Setting.plugin_redmine_issue_rank['rank_custom_field_name'] = 'Rank'
+    project1 = projects(:projects_001)
+    tracker1 = trackers(:trackers_001)
+    tracker2 = trackers(:trackers_002)
+    field = IssueCustomField.create!(
+      :name => 'Rank',
+      :type => 'IssueCustomField',
+      :field_format => 'int',
+      :projects => [project1],
+      :trackers => [tracker1])
+
+    log_user('jsmith', 'jsmith')
+
+    get "/projects/#{project1.identifier}/issues",
+      {
+        :set_filter => '1',
+        :'f[]' => ['status_id', 'subproject_id', ''],
+        :'op[status_id]' => 'o',
+        :'op[subproject_id]' => '!*',
+      }
+    assert_response :success
+    assert_template 'issues/index'
+
+    post "/projects/#{project1.identifier}/issue_rank/update_ranks_with_display_orders"
+    assert_response 302
+    assert_equal I18n.t('issue_rank.please_remove_other_filters_than_subproject'), flash[:error]
+    assert_equal nil, flash[:notice]
+  end
 end
